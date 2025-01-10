@@ -14,7 +14,7 @@ class TestLeafNode(unittest.TestCase):
 
     def test_tag_name_returns_html(self):
         node = LeafNode("p","I know that dude.",{"class":"quintessentialArchetype", "id":"spicoli"})
-        self.assertNotEqual(node.to_html(), '<p class="quintessentialArchetype" id="spicoli">I know that dude.</p>')
+        self.assertEqual(node.to_html(), '<p class="quintessentialArchetype" id="spicoli">I know that dude.</p>')
 
 
 if __name__ == "__main__":
