@@ -74,16 +74,14 @@ def extract_markdown_links(text):
 
 def split_nodes_image(old_nodes):
     if not isinstance(old_nodes, list):
-        raise TypeError(f"Expected lis, got {type(items).__name__}")
+        raise TypeError(f"Expected list, got {type(old_nodes).__name__}")
     new_list = []
     pattern = r'!\[[^\]]*\]\([^)]+\)'
     if old_nodes:
         for node in old_nodes:
             if node.text_type == TextType.TEXT:
                 chunks = re.split(pattern, node.text)
-                print(f"Chunks:{chunks}")
                 images = extract_markdown_images(node.text)
-                print(f"images:{images}")
                 for i, chunk in enumerate(chunks):
                     if chunk:
                         new_list.append(TextNode(chunk, TextType.TEXT))
@@ -93,3 +91,33 @@ def split_nodes_image(old_nodes):
                 new_list.append(node)
     return new_list
 
+def split_nodes_link(old_nodes):
+    if not isinstance(old_nodes, list):
+        raise TypeError(f"Expected list, got {type(old_nodes).__name__}")
+    new_list = []
+    pattern = r'(?<!\!)\[[^\]]*\]\([^)]+\)'
+    if old_nodes:
+        for node in old_nodes:
+            if node.text_type == TextType.TEXT:
+                chunks = re.split(pattern, node.text)
+                links = extract_markdown_links(node.text)
+                for i, chunk in enumerate(chunks):
+                    if chunk:
+                        new_list.append(TextNode(chunk, TextType.TEXT))
+                    if len(links) >= i+1:
+                        new_list.append(TextNode(links[i][0], TextType.LINK, links[i][1]))
+            else:
+                new_list.append(node)
+    return new_list
+
+def text_to_textnodes(text):
+    if not text:
+        return []
+    
+    return  split_nodes_link(split_nodes_image(split_nodes_delimiter(split_nodes_delimiter( split_nodes_delimiter( [TextNode(text,TextType.TEXT)], '**', TextType.BOLD), '*', TextType.ITALIC), '`', TextType.CODE)))
+
+def text_to_html_nodes(text):
+    HTMLNodes = []
+    for node in text_to_textnodes(text):
+        HTMLNodes.append(text_node_to_html_node(node))
+    return HTMLNodes

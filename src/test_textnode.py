@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import TextNode, TextType, text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links
+from textnode import TextNode, TextType, text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes
 from leafnode import LeafNode
 
 class TestTextNode(unittest.TestCase):
@@ -87,6 +87,66 @@ class TestTextNode(unittest.TestCase):
 
     def test_extract_markdown_links5(self):
         self.assertEqual([('Best place', 'https://www.boot.dev'), ('Bing', 'https://www.bing.com')], extract_markdown_links('I contain two links [Best place](https://www.boot.dev) and [Bing](https://www.bing.com)'))
+
+    def test_split_nodes_image(self):
+        old_nodes = []
+        new_nodes = split_nodes_image(old_nodes)
+        expected_nodes = []
+        self.assertEqual(expected_nodes, new_nodes)
+
+    def test_split_nodes_image2(self):
+        old_nodes = [TextNode("This is some text that does not contain any images", TextType.TEXT)]
+        new_nodes = split_nodes_image(old_nodes)
+        expected_nodes = [TextNode("This is some text that does not contain any images", TextType.TEXT)]
+        self.assertEqual(expected_nodes, new_nodes)
+
+    def test_split_nodes_image3(self):
+        old_nodes = [TextNode("This is some text that contains an image at the end: ![alt text](cool.gif)", TextType.TEXT)]
+        new_nodes = split_nodes_image(old_nodes)
+        expected_nodes = [TextNode("This is some text that contains an image at the end: ", TextType.TEXT), TextNode("alt text",TextType.IMAGE, "cool.gif")]
+        self.assertEqual(expected_nodes, new_nodes)
+
+    def test_split_nodes_link(self):
+        old_nodes = []
+        new_nodes = split_nodes_link(old_nodes)
+        expected_nodes = []
+        self.assertEqual(expected_nodes, new_nodes)
+
+    def test_split_nodes_link2(self):
+        old_nodes = [TextNode("This is some text that does not contain any links", TextType.TEXT)]
+        new_nodes = split_nodes_link(old_nodes)
+        expected_nodes = [TextNode("This is some text that does not contain any links", TextType.TEXT)]
+        self.assertEqual(expected_nodes, new_nodes)
+
+    def test_split_nodes_link3(self):
+        old_nodes = [TextNode("This is some text that contains a link at the end: [link_text](link_url)", TextType.TEXT)]
+        new_nodes = split_nodes_link(old_nodes)
+        expected_nodes = [TextNode("This is some text that contains a link at the end: ", TextType.TEXT), TextNode("link_text",TextType.LINK, "link_url")]
+        self.assertEqual(expected_nodes, new_nodes)
+
+    def test_text_to_textnode(self):
+        text = None
+        new_nodes = text_to_textnodes(text)
+        expected_nodes = []
+        self.assertEqual(expected_nodes, new_nodes)
+
+        
+    def test_text_to_textnode2(self):
+        text = "This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        new_nodes = text_to_textnodes(text)
+        expected_nodes = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("text", TextType.BOLD),
+            TextNode(" with an ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" word and a ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" and an ", TextType.TEXT),
+            TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+            TextNode(" and a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://boot.dev"),
+        ]
+        self.assertEqual(expected_nodes, new_nodes)
 
 
 if __name__ == "__main__":

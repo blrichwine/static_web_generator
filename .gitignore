@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 
 # Distribution / packaging
+public/
 dist/
 build/
 *.egg-info/

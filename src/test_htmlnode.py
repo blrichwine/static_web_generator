@@ -19,6 +19,5 @@ class TestHTMLNode(unittest.TestCase):
         node = HTMLNode("h1","History of Kale",None, {"class":"articleTitle", "id":"mainTitle"})
         self.assertEqual(node.__repr__(), "HTMLNode('h1', 'History of Kale', None, {'class': 'articleTitle', 'id': 'mainTitle'})")
 
-
 if __name__ == "__main__":
     unittest.main()
